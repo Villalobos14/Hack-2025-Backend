@@ -28,6 +28,7 @@ pub struct Autor {
     pub redes_sociales: Vec<RedSocial>,
     pub preferencias_notificaciones: PreferenciasNotificaciones,
     pub mangas: Vec<Manga>,
+
     pub nfts_creados: Vec<NFT>,
 }
 
@@ -57,6 +58,7 @@ pub struct Manga {
     pub estado: String,
     pub cantidad_capitulos: i32,
     pub lecturas: i32,
+    pub capitulos_gratis:i32,
     pub capitulos: Vec<Capitulo>,
 }
 
@@ -113,18 +115,16 @@ pub struct NFTAdquirido {
 // Estructura para el estado 
 #[derive(Clone, Default)]
 pub struct State {
-    pub autores: Vec<Autor>,
+    pub autores: HashMap<ActorId, Autor>,
     pub lectores: Vec<Lector>,
+    
 }
 
 // Implementación de métodos para el estado
 impl State {
     
     pub fn new() -> Self {
-        Self { 
-            autores: Vec::new(),
-            lectores: Vec::new(),
-        }
+        Self::default()
     }
 
     pub fn init_state() {
