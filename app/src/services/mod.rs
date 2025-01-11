@@ -1,1 +1,2 @@
-pub mod my_service;
+pub mod author_manager_service;
+
