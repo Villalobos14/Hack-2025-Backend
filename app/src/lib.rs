@@ -1,20 +1,38 @@
 #![no_std]
+
+// necesary crates
 use sails_rs::prelude::*;
 
+// import our modules 
+pub mod states;
 pub mod services;
-use services::my_service::MyService;
+pub mod app_types;
 
-#[derive(Default)]
-pub struct MyProgram;
+// Import service to be used for the program
+use keyring_service::services::keyring_service::KeyringService;
+use services::service::Service;
+
+pub struct Program;
 
 #[program]
-impl MyProgram {
+impl Program {
+    // Application constructor (it is an associated function)
+    // It can be called once per application lifetime.
     pub fn new() -> Self {
+        // Init the state
+        Service::seed();
+
         Self
     }
 
-    #[route("MyService")]
-    pub fn my_service_svc(&self) -> MyService {
-        MyService::new()
+    
+    #[route("Service")]
+    pub fn service_svc(&self) -> Service {
+        Service::new()
+    }
+
+    #[route("Keyring")]
+    pub fn keyring_svc(&self) -> KeyringService {
+        KeyringService::new()
     }
 }

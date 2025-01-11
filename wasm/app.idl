@@ -1,8 +1,126 @@
+type KeyringData = struct {
+  address: str,
+  encoded: str,
+};
+
+type KeyringEvent = enum {
+  KeyringAccountSet,
+  Error: KeyringError,
+};
+
+type KeyringError = enum {
+  KeyringAddressAlreadyEsists,
+  UserAddressAlreadyExists,
+  UserCodedNameAlreadyExists,
+  UserDoesNotHasKeyringAccount,
+  KeyringAccountAlreadyExists,
+  SessionHasInvalidCredentials,
+  UserAndKeyringAddressAreTheSame,
+};
+
+type KeyringQueryEvent = enum {
+  LastWhoCall: actor_id,
+  SignlessAccountAddress: opt actor_id,
+  SignlessAccountData: opt KeyringData,
+};
+
+type Events = enum {
+  AuthorCreated: str,
+  ChapterUnlocked: struct { str, i32 },
+  EarningsCollected: str,
+  Error: str,
+};
+
+type Autor = struct {
+  id: actor_id,
+  nombre: str,
+  email: str,
+  foto_perfil: str,
+  descripcion: str,
+  idioma_origen: str,
+  ingresos_totales: u64,
+  donaciones_recibidas: u64,
+  fecha_registro: str,
+  ultima_actividad: str,
+  estado_cuenta: str,
+  redes_sociales: vec RedSocial,
+  preferencias_notificaciones: PreferenciasNotificaciones,
+  mangas: vec Manga,
+  nfts_creados: vec Nft,
+};
+
+type RedSocial = struct {
+  plataforma: str,
+  url: str,
+};
+
+type PreferenciasNotificaciones = struct {
+  donaciones: bool,
+  estadisticas: bool,
+  mensajes: bool,
+};
+
+type Manga = struct {
+  id: str,
+  titulo: str,
+  estado: str,
+  cantidad_capitulos: i32,
+  lecturas: i32,
+  capitulos: vec Capitulo,
+};
+
+type Capitulo = struct {
+  id: i32,
+  nombre: str,
+  url: str,
+};
+
+type Nft = struct {
+  id: str,
+  descripcion: str,
+  estado: str,
+};
+
+type Lector = struct {
+  id: actor_id,
+  nombre: str,
+  email: str,
+  foto_perfil: str,
+  fecha_registro: str,
+  ultima_actividad: str,
+  capitulos_desbloqueados: vec CapituloDesbloqueado,
+  nfts_adquiridos: vec NftAdquirido,
+};
+
+type CapituloDesbloqueado = struct {
+  capitulo_id: i32,
+  manga_id: str,
+  fecha_desbloqueo: str,
+};
+
+type NftAdquirido = struct {
+  nft_id: str,
+  fecha_adquisicion: str,
+};
+
 constructor {
   New : ();
 };
 
-service MyService {
-  Hello : () -> str;
+service Keyring {
+  BindKeyringDataToUserAddress : (user_address: actor_id, keyring_data: KeyringData) -> KeyringEvent;
+  BindKeyringDataToUserCodedName : (user_coded_name: str, keyring_data: KeyringData) -> KeyringEvent;
+  query KeyringAccountData : (keyring_address: actor_id) -> KeyringQueryEvent;
+  query KeyringAddressFromUserAddress : (user_address: actor_id) -> KeyringQueryEvent;
+  query KeyringAddressFromUserCodedName : (user_coded_name: str) -> KeyringQueryEvent;
+};
+
+service Service {
+  CollectEarnings : (lector_id: actor_id) -> Events;
+  CreateAuthor : (actor_id: actor_id, nombre: str, email: str) -> Events;
+  UnlockChapter : (lector_id: actor_id, capitulo_id: i32, manga_id: str) -> Events;
+  query QueryAuthor : (actor_id: actor_id) -> opt Autor;
+  query QueryManga : (manga_id: str) -> opt Manga;
+  query QueryReader : (lector_id: actor_id) -> opt Lector;
 };
 

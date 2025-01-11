@@ -1,6 +1,6 @@
 use sails_client_gen::ClientGenerator;
+use app::Program;
 use std::{env, path::PathBuf, fs};
-use app::MyProgram;
 
 fn main() {
     // Build contract to get .opt.wasm
@@ -20,17 +20,15 @@ fn main() {
     let client_path = outdir_path.clone().join("app_client.rs");
 
     // This generate the contract IDL
-    sails_idl_gen::generate_idl_to_file::<MyProgram>(idl_path.clone())
+    sails_idl_gen::generate_idl_to_file::<Program>(idl_path.clone())
         .unwrap();
 
     // Generator of the clients of the contract
     ClientGenerator::from_idl_path(&idl_path)
-        // .with_mocks("with_mocks")
         .generate_to(client_path.clone())
         .unwrap();
 
-    // Then, copies the client that is in the OUT_DIR path in the current
-    // directory (wasm), where the 
+    // Then, copies the client that is in the OUT_DIR path in the current directory (wasm), where the 
     // "Cargo.toml" file is located 
     fs::copy(client_path, cargo_toml_path.join("app_client.rs"))
         .unwrap();
